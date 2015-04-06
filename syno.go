@@ -83,6 +83,8 @@ type Client struct {
 	sid       string
 }
 
+// Call makes a request obtained from marshaling the given argument and calls
+// Do with it.
 func (c *Client) Call(r MarshalRequest, data interface{}) error {
 	req, err := r.MarshalRequest()
 	if err != nil {
@@ -260,6 +262,7 @@ const (
 	downloadTaskVersion = "1"
 )
 
+// DownloadTaskList perfoms a list call for download tasks.
 type DownloadTaskList struct {
 	Offset     int
 	Limit      int
