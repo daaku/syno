@@ -156,9 +156,9 @@ func ClientURL(u *url.URL) ClientOption {
 	}
 }
 
-// ClientURLString configures the base Client URL. All API requests are made
+// ClientRawURL configures the base Client URL. All API requests are made
 // relative to this URL.
-func ClientURLString(u string) ClientOption {
+func ClientRawURL(u string) ClientOption {
 	return func(c *Client) error {
 		var err error
 		c.url, err = url.Parse(u)

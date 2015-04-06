@@ -43,7 +43,7 @@ func (f transportFunc) RoundTrip(r *http.Request) (*http.Response, error) {
 func TestClientDoSuccess(t *testing.T) {
 	const data = "data"
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			ensure.DeepEqual(t, r.URL.Host, "foo.com")
 			ensure.DeepEqual(t, r.URL.Scheme, "http")
@@ -80,7 +80,7 @@ func TestClientDoSuccess(t *testing.T) {
 func TestClientDoRequestSID(t *testing.T) {
 	const reqSID = "reqSID"
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientSID("clientSID"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			v, err := url.ParseQuery(r.URL.RawQuery)
@@ -101,7 +101,7 @@ func TestClientDoRequestSID(t *testing.T) {
 func TestClientDoClientSID(t *testing.T) {
 	const clientSID = "reqSID"
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientSID(clientSID),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			v, err := url.ParseQuery(r.URL.RawQuery)
@@ -122,7 +122,7 @@ func TestClientDoClientSID(t *testing.T) {
 func TestClientDoTransportError(t *testing.T) {
 	givenErr := errors.New("")
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			return nil, givenErr
 		})),
@@ -134,7 +134,7 @@ func TestClientDoTransportError(t *testing.T) {
 
 func TestClientDoNonJSON(t *testing.T) {
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			return &http.Response{
 				Body: ioutil.NopCloser(strings.NewReader(".")),
@@ -148,7 +148,7 @@ func TestClientDoNonJSON(t *testing.T) {
 
 func TestClientDoDataJSONError(t *testing.T) {
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			return &http.Response{
 				Body: ioutil.NopCloser(jsonpipe.Encode(map[string]interface{}{
@@ -166,7 +166,7 @@ func TestClientDoDataJSONError(t *testing.T) {
 
 func TestClientAPIError(t *testing.T) {
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			return &http.Response{
 				Body: ioutil.NopCloser(jsonpipe.Encode(map[string]interface{}{
@@ -184,7 +184,7 @@ func TestClientAPIError(t *testing.T) {
 
 func TestClientLogin(t *testing.T) {
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			v, err := url.ParseQuery(r.URL.RawQuery)
 			ensure.Nil(t, err)
@@ -213,7 +213,7 @@ func TestClientLogin(t *testing.T) {
 func TestClientLoginError(t *testing.T) {
 	givenErr := errors.New("")
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			return nil, givenErr
 		})),
@@ -231,7 +231,7 @@ type funcMarshalRequest func() (*Request, error)
 func (f funcMarshalRequest) MarshalRequest() (*Request, error) { return f() }
 
 func TestCallMarshalError(t *testing.T) {
-	c, err := NewClient(ClientURLString("http://foo.com/"))
+	c, err := NewClient(ClientRawURL("http://foo.com/"))
 	ensure.Nil(t, err)
 	givenErr := errors.New("")
 	err = c.Call(
@@ -244,7 +244,7 @@ func TestCallMarshalError(t *testing.T) {
 func TestCallTransportError(t *testing.T) {
 	givenErr := errors.New("")
 	c, err := NewClient(
-		ClientURLString("http://foo.com/"),
+		ClientRawURL("http://foo.com/"),
 		ClientTransport(transportFunc(func(r *http.Request) (*http.Response, error) {
 			return nil, givenErr
 		})),
