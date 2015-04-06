@@ -219,7 +219,7 @@ func NewClient(options ...ClientOption) (*Client, error) {
 }
 
 const (
-	authLoginPath    = "auth.cgi"
+	authLoginPath    = "/webapi/auth.cgi"
 	authLoginAPI     = "SYNO.API.Auth"
 	authLoginVersion = "3"
 )
@@ -257,7 +257,7 @@ type AuthLoginResponse struct {
 }
 
 const (
-	downloadTaskPath    = "DownloadStation/task.cgi"
+	downloadTaskPath    = "/webapi/DownloadStation/task.cgi"
 	downloadTaskAPI     = "SYNO.DownloadStation.Task"
 	downloadTaskVersion = "1"
 )
