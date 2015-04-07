@@ -203,7 +203,7 @@ func ClientLogin(l AuthLogin) ClientOption {
 
 // NewClient creates a new client with the given options.
 func NewClient(options ...ClientOption) (*Client, error) {
-	var c Client
+	c := Client{transport: http.DefaultTransport}
 	for _, o := range options {
 		if err := o(&c); err != nil {
 			return nil, err
@@ -211,9 +211,6 @@ func NewClient(options ...ClientOption) (*Client, error) {
 	}
 	if c.url == nil || !c.url.IsAbs() {
 		return nil, errURLMisconfigured
-	}
-	if c.transport == nil {
-		c.transport = http.DefaultTransport
 	}
 	return &c, nil
 }
