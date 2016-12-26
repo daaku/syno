@@ -5,6 +5,7 @@
 package syno
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -85,17 +86,21 @@ type Client struct {
 
 // Call makes a request obtained from marshaling the given argument and calls
 // Do with it.
-func (c *Client) Call(r MarshalRequest, data interface{}) error {
+func (c *Client) Call(
+	ctx context.Context,
+	r MarshalRequest,
+	data interface{},
+) error {
 	req, err := r.MarshalRequest()
 	if err != nil {
 		return err
 	}
-	return c.Do(req, data)
+	return c.Do(ctx, req, data)
 }
 
 // Do performs an API request and unmarshals the "Data" into the passed in
 // argument. If data is nil, it is ignored.
-func (c *Client) Do(r *Request, data interface{}) error {
+func (c *Client) Do(ctx context.Context, r *Request, data interface{}) error {
 	v := make(url.Values)
 	v.Add("api", r.API)
 	v.Add("version", r.Version)
@@ -113,14 +118,14 @@ func (c *Client) Do(r *Request, data interface{}) error {
 		}
 	}
 
-	hreq := &http.Request{
+	hreq := (&http.Request{
 		Method: "GET",
 		URL: c.url.ResolveReference(&url.URL{
 			Path:     r.Path,
 			RawQuery: v.Encode(),
 		}),
 		Header: make(http.Header),
-	}
+	}).WithContext(ctx)
 	hres, err := c.transport.RoundTrip(hreq)
 	if err != nil {
 		return err
@@ -193,7 +198,7 @@ func ClientLogin(l AuthLogin) ClientOption {
 	return func(c *Client) error {
 		var res AuthLoginResponse
 		l.Format = "sid"
-		if err := c.Call(l, &res); err != nil {
+		if err := c.Call(context.Background(), l, &res); err != nil {
 			return err
 		}
 		c.sid = res.SID

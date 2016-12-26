@@ -1,6 +1,7 @@
 package syno
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -65,7 +66,7 @@ func TestClientDoSuccess(t *testing.T) {
 	)
 	ensure.Nil(t, err)
 	var res string
-	err = c.Do(&Request{
+	err = c.Do(context.Background(), &Request{
 		API:     "api",
 		Method:  "method",
 		Version: "version",
@@ -94,7 +95,7 @@ func TestClientDoRequestSID(t *testing.T) {
 		})),
 	)
 	ensure.Nil(t, err)
-	err = c.Do(&Request{SID: reqSID}, nil)
+	err = c.Do(context.Background(), &Request{SID: reqSID}, nil)
 	ensure.Nil(t, err)
 }
 
@@ -115,7 +116,7 @@ func TestClientDoClientSID(t *testing.T) {
 		})),
 	)
 	ensure.Nil(t, err)
-	err = c.Do(&Request{}, nil)
+	err = c.Do(context.Background(), &Request{}, nil)
 	ensure.Nil(t, err)
 }
 
@@ -128,7 +129,7 @@ func TestClientDoTransportError(t *testing.T) {
 		})),
 	)
 	ensure.Nil(t, err)
-	err = c.Do(&Request{}, nil)
+	err = c.Do(context.Background(), &Request{}, nil)
 	ensure.DeepEqual(t, err, givenErr)
 }
 
@@ -142,7 +143,7 @@ func TestClientDoNonJSON(t *testing.T) {
 		})),
 	)
 	ensure.Nil(t, err)
-	err = c.Do(&Request{}, nil)
+	err = c.Do(context.Background(), &Request{}, nil)
 	ensure.Err(t, err, regexp.MustCompile("invalid character"))
 }
 
@@ -160,7 +161,7 @@ func TestClientDoDataJSONError(t *testing.T) {
 	)
 	ensure.Nil(t, err)
 	var res string
-	err = c.Do(&Request{}, &res)
+	err = c.Do(context.Background(), &Request{}, &res)
 	ensure.Err(t, err, regexp.MustCompile("cannot unmarshal bool into Go value of type string"))
 }
 
@@ -178,7 +179,7 @@ func TestClientAPIError(t *testing.T) {
 		})),
 	)
 	ensure.Nil(t, err)
-	err = c.Do(&Request{}, nil)
+	err = c.Do(context.Background(), &Request{}, nil)
 	ensure.DeepEqual(t, err, ErrorUnknown)
 }
 
@@ -235,6 +236,7 @@ func TestCallMarshalError(t *testing.T) {
 	ensure.Nil(t, err)
 	givenErr := errors.New("")
 	err = c.Call(
+		context.Background(),
 		funcMarshalRequest(func() (*Request, error) { return nil, givenErr }),
 		nil,
 	)
@@ -251,6 +253,7 @@ func TestCallTransportError(t *testing.T) {
 	)
 	ensure.Nil(t, err)
 	err = c.Call(
+		context.Background(),
 		funcMarshalRequest(func() (*Request, error) { return &Request{}, nil }),
 		nil,
 	)
